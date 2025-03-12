@@ -7,17 +7,31 @@ def compile_modalities(input_filepath: str, modalities_json: str):
     """Extracts and compiles modalities from JSON files."""
     data = read_json(modalities_json)
     all_files = sorted(glob.glob(f"{input_filepath}/*.json"))
+    modal_files = {}
     modal_data = []
-    
+
     for key, value in data.items():
         for file in all_files:
             if value[0] in file:
                 json_file = read_json(file)
                 image_type = json_file.get('ImageType', [])
-                
+
                 if 'ORIGINAL' in image_type:
+                    modal_files[key] = file
                     modal_data.append([key, file.replace('.json', '.nii'), 'ORIGINAL', json_file['AcquisitionTime']])
-                    break
+                    break  # Exit loop once ORIGINAL is found for this key
+
+    for key, value in data.items():
+        if key in modal_files:  # Skip if ORIGINAL already exists
+            continue
+        
+        for file in all_files:
+            if value[0] in file:
+                json_file = read_json(file)
+                if 'DERIVED' in json_file.get('ImageType', []):
+                    modal_files[key] = file
+                    modal_data.append([key, file.replace('.json', '.nii'), 'DERIVED', json_file['AcquisitionTime']])
+                    break  # Exit loop once DERIVED is found for this key
     
     modal_df = pd.DataFrame(modal_data, columns=['Modality', 'Filepath', 'Type', 'AcqTime'])
     modal_df = modal_df.sort_values(by='AcqTime').reset_index(drop=True)
