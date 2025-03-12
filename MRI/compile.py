@@ -1,15 +1,20 @@
 import os
 import glob
+import shutil
+import subprocess
 import pandas as pd
-from utils import read_json
+from .utils import read_json
 
 def compile_modalities(input_filepath: str, modalities_json: str):
     """Extracts and compiles modalities from JSON files."""
     data = read_json(modalities_json)
     all_files = sorted(glob.glob(f"{input_filepath}/*.json"))
+    
+    # Create temporary bins
     modal_files = {}
     modal_data = []
 
+    # Get ORIGINAL scans
     for key, value in data.items():
         for file in all_files:
             if value[0] in file:
@@ -21,6 +26,7 @@ def compile_modalities(input_filepath: str, modalities_json: str):
                     modal_data.append([key, file.replace('.json', '.nii'), 'ORIGINAL', json_file['AcquisitionTime']])
                     break  # Exit loop once ORIGINAL is found for this key
 
+    # Get DERIVED scans
     for key, value in data.items():
         if key in modal_files:  # Skip if ORIGINAL already exists
             continue
@@ -33,13 +39,14 @@ def compile_modalities(input_filepath: str, modalities_json: str):
                     modal_data.append([key, file.replace('.json', '.nii'), 'DERIVED', json_file['AcquisitionTime']])
                     break  # Exit loop once DERIVED is found for this key
     
+    # Compile ORIGINAL and DERIVED scans
     modal_df = pd.DataFrame(modal_data, columns=['Modality', 'Filepath', 'Type', 'AcqTime'])
     modal_df = modal_df.sort_values(by='AcqTime').reset_index(drop=True)
     modal_df.to_csv(os.path.join(input_filepath, 'modal_data.csv'))
     
     return modal_df
 
-def compile_qc_data(session_path: str, modal_data: pd.DataFrame):
+def compile_qc_folder(session_path: str, modal_data: pd.DataFrame):
     """
     Compile data into structured directories for QC.
     """
@@ -75,10 +82,8 @@ def compile_qc_data(session_path: str, modal_data: pd.DataFrame):
                     if os.path.exists(src_file):
                         shutil.copyfile(src_file, dest_file)
 
-        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=False)
-        output, error = proc.communicate()
-
-def compile_subject_folder(sessions_path: str, bids_id: str, modal_data):
+def compile_sub_folder(sessions_path: str, bids_id: str, modal_data):
+    # BIDS folder filenames - DEFAULTS
     qc_modals = {
         'T1'    : ('anat', f'{bids_id}_T1w'),
         'T2S'   : ('anat', f'{bids_id}_T2star'),
@@ -89,19 +94,11 @@ def compile_subject_folder(sessions_path: str, bids_id: str, modal_data):
         'DTI64' : ('dwi', f'{bids_id}_dti64_dwi'),
     }
 
-    rename_qc = {
-    'DTI20' : f'{bids_id}_mriqc_DTI20.tsv',
-    'DTI64' : f'{bids_id}_mriqc_DTI64.tsv',
-    'fMRI' : f'{bids_id}_mriqc_fMRI.tsv',
-    'T1' : f'{bids_id}_mriqc_T1.tsv'
-    }
-
+    # BIDS folder organization
     sub_folder = os.path.join('output', sessions_path.split("/")[-1])
     os.makedirs(sub_folder, exist_ok=True)
 
-    qc_folder = os.path.join('output', sessions_path.split("/")[-1], 'qc')
-    os.makedirs(qc_folder, exist_ok=True)
-
+    # BIDS folder compilation
     for modal, (subdir, file_prefix) in qc_modals.items():
         if modal in modal_data['Modality'].values:
             file_path = modal_data.loc[modal_data['Modality'] == modal, 'Filepath'].values[0]
@@ -121,11 +118,20 @@ def compile_subject_folder(sessions_path: str, bids_id: str, modal_data):
                     if os.path.exists(src_file):
                         shutil.copyfile(src_file, dest_file)
 
+    # MRIQC folder filenames - DEFAULTS
+    rename_qc = {
+    'DTI20' : f'{bids_id}_mriqc_DTI20.tsv',
+    'DTI64' : f'{bids_id}_mriqc_DTI64.tsv',
+    'fMRI' : f'{bids_id}_mriqc_fMRI.tsv',
+    'T1' : f'{bids_id}_mriqc_T1.tsv'}
+
+    # MRIQC folder organization
+    qc_folder = os.path.join('output', sessions_path.split("/")[-1], 'qc')
+    os.makedirs(qc_folder, exist_ok=True)
+
+    # MRIQC folder compilation
     mriqc_tsv = glob.glob(sessions_path + "/**/group_*.tsv", recursive=True)
     for file in mriqc_tsv:
         modal = file.split("_output")[0].split("/")[-1]
         filename = rename_qc.get(modal)
-        src = file
-        dst = os.path.join(qc_folder, filename)
-        shutil.copyfile(src, dst)
-
+        shutil.copyfile(file, os.path.join(qc_folder, filename))
