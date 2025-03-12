@@ -6,13 +6,17 @@ def run_mriqc(session_path: str):
     """
     qc_modals = ['T1', 'fMRI', 'DTI20', 'DTI64']
     
+    # Validation checks
+    if not os.path.isdir(session_path):
+        raise FileNotFoundError(f"Session folder '{session_path}' does not exist.")
+
     for modal in qc_modals:
         bids_dir = os.path.join(session_path, 'qc', modal)
         qc_output = os.path.join(session_path, 'qc', f"{modal}_output")
         os.makedirs(qc_output, exist_ok=True)
         
         # Run participant level analysis
-        cmd = ['bash', '-c', f"source .mriqc/bin/activate && mriqc {bids_dir} {qc_output} participant --participant-label sub-001 --no-sub"]
+        cmd = ['bash', '-c', f"source .mriqc/bin/activate && mriqc {bids_dir} {qc_output} participant --participant-label sub-001 --no-sub --nprocs 32 --omp-nthreads 16"]
         proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         output, error = proc.communicate()
         
