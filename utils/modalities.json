@@ -1,0 +1,12 @@
+{
+    "T1" : ["t1_mprage_sag_p2_iso_TA_5.03"],
+    "fMRI" : ["ep2d_bold_moco_RESTING_NPR-22-11-15"],
+    "DTI20" : ["ep2d_diff_mddw_20_p2(DTI)"],
+    "DTI64" : ["ep2d_diff_4scan_trace_p2_s2_2mm"],
+    "T2S" : ["t2_fl3d_sag_T2_star_iso"],
+    "T2F" : ["t2_FLAIR_3D_sag_p2_iso"],
+    "HRH" : ["t2_tse_HRH_tra_448_2mm"],
+    "SGM" : ["svs_Prs97_GM_m_ECC"],
+    "SWM" : ["svs_Prs97_m_ECC"],
+    "ASL" : ["tgse_pcasl_5delay_2.5x2.5x3a"]
+}

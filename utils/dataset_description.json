@@ -1,0 +1,35 @@
+{
+  "Name": "CBR MRI Dataset",
+  "BIDSVersion": "1.6.0",
+  "DatasetType": "raw",
+  "License": "CC0",
+  "Authors": [
+    "Jonas S Sundarakumar",
+    "Centre for Brain Research",
+    "Indian Institute of Science"
+  ],
+  "Acknowledgements": "Special thanks to all the members involved in the efforts.",
+  "Funding": [
+    "Centre for Brain Research"
+  ],
+  "EthicsApprovals": [
+    "Approved by competent authoririties."
+  ],
+  "HEDVersion": "8.0.0",
+  "GeneratedBy": [
+    {
+      "Name": "reproin",
+      "Version": "0.6.0",
+      "Container": {
+        "Type": "docker",
+        "Tag": "repronim/reproin:0.6.0"
+      }
+    }
+  ],
+  "SourceDatasets": [
+    {
+      "URL": "some/example/url",
+      "Version": "April 11 2011"
+    }
+  ]
+}
