@@ -1,0 +1,77 @@
+{
+  "descriptions": [
+    {
+      "datatype": "anat",
+      "suffix": "T1w",
+      "criteria": {
+        "SeriesDescription": "t1_mprage_sag_p2_iso_TA_5.03"
+      },
+      "sidecar_changes": {
+        "ProtocolName": "T1"
+      }
+    },
+    {
+      "datatype": "func",
+      "suffix": "bold",
+      "custom_entities": "task-rest",
+      "criteria": {
+        "SeriesDescription": "ep2d_bold_moco_RESTING_NPR-22-11-15"
+      }
+    },
+    {
+      "datatype": "dwi",
+      "suffix": "dwi",
+      "criteria": {
+        "SeriesDescription": "ep2d_diff_mddw_20_p2(DTI)"
+      }
+    },
+    {
+      "datatype": "dwi",
+      "suffix": "dwi",
+      "criteria": {
+        "SeriesDescription": "ep2d_diff_4scan_trace_p2_s2_2mm"
+      }
+    },
+    {
+      "datatype": "anat",
+      "suffix": "T2starw",
+      "criteria": {
+        "SeriesDescription": "t2_fl3d_sag_T2_star_iso"
+      },
+      "sidecar_changes": {
+        "ProtocolName": "T2S"
+      }
+    },
+    {
+      "datatype": "anat",
+      "suffix": "FLAIR",
+      "criteria": {
+        "SeriesDescription": "t2_FLAIR_3D_sag_p2_iso"
+      },
+      "sidecar_changes": {
+        "ProtocolName": "T2F"
+      }
+    },
+    {
+      "datatype": "anat",
+      "suffix": "T2w",
+      "criteria": {
+        "SeriesDescription": "t2_tse_HRH_tra_448_2mm"
+      },
+      "sidecar_changes": {
+        "ProtocolName": "HRH"
+      }
+    },
+    {
+      "datatype": "asl",
+      "suffix": "asl",
+      "criteria": {
+        "SeriesDescription": "tgse_pcasl_5delay_2.5x2.5x3a"
+      },
+      "sidecar_changes": {
+        "ProtocolName": "ASL"
+      }
+    }
+  ]
+}
+
